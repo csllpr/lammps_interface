@@ -406,6 +406,7 @@ class MolecularGraph(nx.Graph):
         v1 = v1 / norm1
         v2 = v2 / norm2
 
+        # Clip to handle floating-point precision errors that could make the dot product slightly outside [-1, 1] range
         a = np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0))
         if np.isnan(a):
             if np.allclose((v1 + v2), np.zeros(3)):
@@ -474,6 +475,7 @@ class MolecularGraph(nx.Graph):
         n1 = n1 / norm_n1
         n2 = n2 / norm_n2
 
+        # Clip to handle floating-point precision errors that could make the dot product slightly outside [-1, 1] range
         a = np.arccos(np.clip(np.dot(n1, n2), -1.0, 1.0))
         if np.isnan(a):
             a = 0.0

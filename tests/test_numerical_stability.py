@@ -13,9 +13,9 @@ class TestComputeAngleBetween:
         from lammps_interface.structure_data import MolecularGraph
 
         graph = MolecularGraph()
-        # Add three nodes where l and m are at the same position
+        # Add three nodes where l and m are at the same position (coincident atoms for zero-length vector test)
         graph.add_node(1, cartesian_coordinates=np.array([0.0, 0.0, 0.0]))
-        graph.add_node(2, cartesian_coordinates=np.array([0.0, 0.0, 0.0]))  # Same as node 1
+        graph.add_node(2, cartesian_coordinates=np.array([0.0, 0.0, 0.0]))  # Coincident with node 1
         graph.add_node(3, cartesian_coordinates=np.array([1.0, 0.0, 0.0]))
 
         # Should not crash and should return 0
