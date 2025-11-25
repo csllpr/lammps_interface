@@ -118,7 +118,8 @@ class CIF(object):
                     self._data[key] = val
                 else:
                     self._data[key] = [val]
-            except:
+            except (TypeError, AttributeError) as e:
+                print("Error appending data for key '{}': {}".format(key, e))
                 print(self._data.keys())
 
     def get_element_label(self, el):

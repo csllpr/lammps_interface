@@ -396,15 +396,23 @@ class MolecularGraph(nx.Graph):
             v1 = coordl - coordm
             v2 = coordr - coordm
 
-        v1 /= np.linalg.norm(v1)
-        v2 /= np.linalg.norm(v2)
+        norm1 = np.linalg.norm(v1)
+        norm2 = np.linalg.norm(v2)
 
-        a = np.arccos(np.dot(v1, v2))
+        # Check for zero-length vectors (coincident atoms)
+        if norm1 < 1e-10 or norm2 < 1e-10:
+            return 0.0
+
+        v1 = v1 / norm1
+        v2 = v2 / norm2
+
+        # Clip to handle floating-point precision errors that could make the dot product slightly outside [-1, 1] range
+        a = np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0))
         if np.isnan(a):
-            if np.allclose((v1 + v2),np.zeros(3)):
-                a = 180
+            if np.allclose((v1 + v2), np.zeros(3)):
+                a = np.pi  # 180 degrees in radians
             else:
-                a = 0
+                a = 0.0
 
         angle = a / DEG2RAD
         return angle
@@ -423,9 +431,19 @@ class MolecularGraph(nx.Graph):
         v1 = vects[0]
         v2 = vects[1]
         n = np.cross(v1, v2)
-        n /= np.linalg.norm(n)
+        norm_n = np.linalg.norm(n)
+
+        # Check for zero-length cross product (collinear first two neighbors)
+        if norm_n < 1e-10:
+            return False
+
+        n = n / norm_n
         for v in vects[2:]:
-            v /= np.linalg.norm(v)
+            norm_v = np.linalg.norm(v)
+            # Check for zero-length vector (coincident neighbor)
+            if norm_v < 1e-10:
+                continue
+            v = v / norm_v
             # what is a good tolerance for co-planarity in MOFs?
             # this is used solely to determine if a 4-coordinated metal atom
             # is square planar or tetrahedral..
@@ -447,12 +465,20 @@ class MolecularGraph(nx.Graph):
         n1 = np.cross(v1, v2)
         n2 = np.cross(v3, v4)
 
-        n1 /= np.linalg.norm(n1)
-        n2 /= np.linalg.norm(n2)
+        norm_n1 = np.linalg.norm(n1)
+        norm_n2 = np.linalg.norm(n2)
 
-        a = np.arccos(np.dot(n1, n2))
+        # Check for zero-length cross products (collinear atoms)
+        if norm_n1 < 1e-10 or norm_n2 < 1e-10:
+            return 0.0
+
+        n1 = n1 / norm_n1
+        n2 = n2 / norm_n2
+
+        # Clip to handle floating-point precision errors that could make the dot product slightly outside [-1, 1] range
+        a = np.arccos(np.clip(np.dot(n1, n2), -1.0, 1.0))
         if np.isnan(a):
-            a = 0
+            a = 0.0
         angle = a / DEG2RAD
         return angle
 
