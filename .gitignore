@@ -31,3 +31,7 @@ ENV/
 
 # vim
 *.swp
+
+# LAMMPS generated files
+data.*
+in.*
